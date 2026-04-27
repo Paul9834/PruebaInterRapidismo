@@ -1,4 +1,4 @@
-# InterRapidismo Technical Test - Android 🚚
+# InterRapidisimo Technical Test - Android 🚚
 
 Este proyecto es una implementación profesional de una prueba técnica para **InterRapidismo**, desarrollada en **Kotlin** bajo una arquitectura de vanguardia, enfocada en la escalabilidad, el mantenimiento y la facilidad de prueba.
 
