@@ -27,7 +27,7 @@ fun HomeScreen(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Mi Perfil", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = InterBlue)
+        Text("Prueba Tecnica / Kevin Montealegre", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = InterOrange)
         Spacer(modifier = Modifier.height(24.dp))
 
         Card(
