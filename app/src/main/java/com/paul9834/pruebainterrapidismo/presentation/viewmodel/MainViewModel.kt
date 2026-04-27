@@ -24,21 +24,33 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
     fun initAppFlow(localVersion: String) {
         viewModelScope.launch {
             isLoading = true
+            statusMessage = "Validando versión..."
+
             // 1. Control de Versiones
             repository.checkVersion(localVersion).onSuccess { apiVersion ->
-                statusMessage = when {
+                val msgVersion = when {
                     localVersion < apiVersion -> "Versión local desactualizada (API: $apiVersion)"
                     localVersion > apiVersion -> "Versión local es superior a la del API"
                     else -> "Aplicativo actualizado"
                 }
+                statusMessage = msgVersion
+            }.onFailure {
+                statusMessage = "Error Versión: ${it.message}"
             }
 
             // 2. Login y Sincronización de Tablas
             repository.login().onSuccess { loggedUser ->
                 user = loggedUser
-                repository.syncSchemas().onSuccess { tables = it }
+                statusMessage += "\nLogin exitoso." // Concatenamos para no borrar el texto de arriba
+
+                repository.syncSchemas().onSuccess {
+                    tables = it
+                    statusMessage += "\nTablas sincronizadas."
+                }.onFailure {
+                    statusMessage += "\nError Tablas: ${it.message}"
+                }
             }.onFailure {
-                statusMessage = "Error de Autenticación: ${it.message}"
+                statusMessage += "\nError de Autenticación: ${it.message}"
             }
             isLoading = false
         }
@@ -54,7 +66,13 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
     fun fetchLocations() {
         viewModelScope.launch {
             isLoading = true
-            repository.getLocations().onSuccess { locations = it }
+            statusMessage = "Cargando localidades..."
+            repository.getLocations().onSuccess {
+                locations = it
+                statusMessage = "Localidades listas."
+            }.onFailure {
+                statusMessage = "Error localidades: ${it.message}"
+            }
             isLoading = false
         }
     }

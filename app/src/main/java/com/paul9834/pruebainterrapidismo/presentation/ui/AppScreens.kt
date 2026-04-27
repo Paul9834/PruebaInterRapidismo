@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.paul9834.pruebainterrapidismo.presentation.viewmodel.MainViewModel
 
 val InterOrange = Color(0xFFFF6600)
-val InterBlue = Color(0Origin(0xFF003366))
-
+val InterBlue = Color(0xFF003366)
 @Composable
 fun HomeScreen(
     vm: MainViewModel,

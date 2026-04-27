@@ -27,8 +27,19 @@ class AppRepositoryImpl(
             val response = api.login(request = LoginRequest())
             val body = response.body()
             if (response.isSuccessful && response.code() == 200 && body != null) {
-                userDao.insertUser(UserEntity(body.usuario, body.identificacion, body.nombre))
-                Result.success(User(body.usuario, body.identificacion, body.nombre))
+
+                val usuario = body.usuario ?: ""
+                val identificacion = body.identificacion ?: ""
+                val nombre = body.nombre ?: ""
+
+                // AQUÍ ESTÁ LA MAGIA: Parámetros nombrados
+                userDao.insertUser(UserEntity(
+                    usuario = usuario,
+                    identificacion = identificacion,
+                    nombre = nombre
+                ))
+
+                Result.success(User(usuario, identificacion, nombre))
             } else {
                 Result.failure(Exception("Alerta: Código ${response.code()}"))
             }
@@ -40,7 +51,7 @@ class AppRepositoryImpl(
             val response = api.getSchema()
             val body = response.body()
             if (response.isSuccessful && body != null) {
-                val entities = body.map { SchemaEntity(it.nombreTabla) }
+                val entities = body.map { SchemaEntity(it.nombreTabla ?: "") }
                 schemaDao.insertSchemas(entities)
                 Result.success(entities.map { TableSchema(it.nombreTabla) })
             } else {
@@ -54,7 +65,7 @@ class AppRepositoryImpl(
             val response = api.getLocations()
             if (response.isSuccessful) {
                 val locations = response.body()?.map {
-                    Location(it.abreviacionCiudad, it.nombreCompleto)
+                    Location(it.abreviacionCiudad ?: "", it.nombreCompleto ?: "")
                 } ?: emptyList()
                 Result.success(locations)
             } else {
@@ -64,9 +75,14 @@ class AppRepositoryImpl(
     }
 
     override suspend fun getLocalUser(): User? {
-        return userDao.getUser()?.let { User(it.usuario, it.identificacion, it.nombre) }
+        return userDao.getUser()?.let {
+            User(
+                usuario = it.usuario ?: "",
+                identificacion = it.identificacion ?: "",
+                nombre = it.nombre ?: ""
+            )
+        }
     }
-
     override suspend fun getLocalSchemas(): List<TableSchema> {
         return schemaDao.getAllSchemas().map { TableSchema(it.nombreTabla) }
     }
