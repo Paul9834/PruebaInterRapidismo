@@ -1,4 +1,4 @@
-package com.paul9834.pruebainterrapidismo.ui.theme
+package com.paul9834.pruebainterrapidismo.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
