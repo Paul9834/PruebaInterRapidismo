@@ -3,45 +3,43 @@ package com.paul9834.pruebainterrapidismo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material3.Surface
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.paul9834.pruebainterrapidismo.presentation.ui.*
 import com.paul9834.pruebainterrapidismo.presentation.ui.theme.PruebaInterRapidismoTheme
+import com.paul9834.pruebainterrapidismo.presentation.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             PruebaInterRapidismoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+
+                val navController = rememberNavController()
+                val vm: MainViewModel = viewModel(factory = MainViewModel.Factory)
+
+                // Ejecutamos el flujo de seguridad al arrancar
+                vm.initAppFlow(localVersion = "1.0")
+
+                Surface {
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable("home") {
+                            HomeScreen(vm,
+                                onGoToTables = { navController.navigate("tables") },
+                                onGoToLocations = {
+                                    vm.fetchLocations()
+                                    navController.navigate("locations")
+                                }
+                            )
+                        }
+                        composable("tables") { TablesScreen(vm) }
+                        composable("locations") { LocationsScreen(vm) }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PruebaInterRapidismoTheme {
-        Greeting("Android")
     }
 }
