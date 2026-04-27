@@ -21,6 +21,7 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
     var statusMessage by mutableStateOf("")
     var isLoading by mutableStateOf(false)
 
+
     fun initAppFlow(localVersion: String) {
         viewModelScope.launch {
             isLoading = true
@@ -28,20 +29,20 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
 
             // 1. Control de Versiones
             repository.checkVersion(localVersion).onSuccess { apiVersion ->
-                val msgVersion = when {
+                statusMessage = when {
                     localVersion < apiVersion -> "Versión local desactualizada (API: $apiVersion)"
                     localVersion > apiVersion -> "Versión local es superior a la del API"
                     else -> "Aplicativo actualizado"
                 }
-                statusMessage = msgVersion
             }.onFailure {
                 statusMessage = "Error Versión: ${it.message}"
             }
 
-            // 2. Login y Sincronización de Tablas
-            repository.login().onSuccess { loggedUser ->
-                user = loggedUser
-                statusMessage += "\nLogin exitoso." // Concatenamos para no borrar el texto de arriba
+            // 2. Login y Sincronización
+            repository.login().onSuccess {
+                // En lugar de confiar solo en el objeto 'it', traemos lo que quedó en DB
+                getLocalData()
+                statusMessage += "\nLogin exitoso."
 
                 repository.syncSchemas().onSuccess {
                     tables = it
@@ -55,6 +56,7 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
             isLoading = false
         }
     }
+
 
     fun getLocalData() {
         viewModelScope.launch {

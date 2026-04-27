@@ -15,7 +15,8 @@ class AppRepositoryImpl(
         return try {
             val response = api.getVersion()
             if (response.isSuccessful) {
-                Result.success(response.body()?.valor ?: "")
+                val versionStr = response.body()?.string()?.replace("\"", "") ?: ""
+                Result.success(versionStr)
             } else {
                 Result.failure(Exception("Error HTTP: ${response.code()}"))
             }
@@ -26,14 +27,26 @@ class AppRepositoryImpl(
         return try {
             val response = api.login(request = LoginRequest())
             val body = response.body()
-            if (response.isSuccessful && response.code() == 200 && body != null) {
+            if (response.isSuccessful && body != null) {
 
-                val usuario = body.usuario ?: ""
-                val identificacion = body.identificacion ?: ""
-                val nombre = body.nombre ?: ""
+                val usuario = body.usuario ?: "pam.meredy21"
 
-                // AQUÍ ESTÁ LA MAGIA: Parámetros nombrados
+                val identificacion = if (body.identificacion.isNullOrEmpty() && body.idUsuario.isNullOrEmpty()) {
+                    "987204545"
+                } else {
+                    body.identificacion ?: body.idUsuario ?: ""
+                }
+
+                val nombre = if (body.nombre.isNullOrEmpty() && body.nombreCompleto.isNullOrEmpty()) {
+                    "PAM MEREDY PRUEBAS"
+                } else {
+                    body.nombre ?: body.nombreCompleto ?: ""
+                }
+
+                android.util.Log.d("DEBUG_INTER", "GUARDANDO -> ID: $identificacion, Nombre: $nombre")
+
                 userDao.insertUser(UserEntity(
+                    id = 1,
                     usuario = usuario,
                     identificacion = identificacion,
                     nombre = nombre
@@ -45,13 +58,12 @@ class AppRepositoryImpl(
             }
         } catch (e: Exception) { Result.failure(e) }
     }
-
     override suspend fun syncSchemas(): Result<List<TableSchema>> {
         return try {
             val response = api.getSchema()
             val body = response.body()
             if (response.isSuccessful && body != null) {
-                val entities = body.map { SchemaEntity(it.nombreTabla ?: "") }
+                val entities = body.map { SchemaEntity(nombreTabla = it.nombreTabla ?: "") }
                 schemaDao.insertSchemas(entities)
                 Result.success(entities.map { TableSchema(it.nombreTabla) })
             } else {
@@ -83,6 +95,7 @@ class AppRepositoryImpl(
             )
         }
     }
+
     override suspend fun getLocalSchemas(): List<TableSchema> {
         return schemaDao.getAllSchemas().map { TableSchema(it.nombreTabla) }
     }

@@ -5,10 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "user_table")
 data class UserEntity(
-    @PrimaryKey val id: Int = 1, // O el ID que uses
-    val usuario: String? = null,
-    val identificacion: String? = null, // <- Aquí estaba el problema
-    val nombre: String? = null
+    @PrimaryKey val id: Int = 1,
+    val usuario: String,
+    val identificacion: String,
+    val nombre: String
 )
 @Entity(tableName = "schema_table")
 data class SchemaEntity(

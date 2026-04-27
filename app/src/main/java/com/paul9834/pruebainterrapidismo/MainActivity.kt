@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val vm: MainViewModel = viewModel(factory = MainViewModel.Factory)
 
-                // Ejecutamos el flujo de seguridad al arrancar
                 vm.initAppFlow(localVersion = "0.1")
 
                 Surface {

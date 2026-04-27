@@ -11,11 +11,16 @@ data class LoginRequest(
 )
 
 data class LoginResponse(
-    @SerializedName("Usuario") val usuario: String,
-    @SerializedName("Identificacion") val identificacion: String,
-    @SerializedName("Nombre") val nombre: String
-)
+    @SerializedName("Usuario") val usuario: String? = null,
 
+    @SerializedName("Identificacion") val identificacion: String? = null,
+    @SerializedName("IdUsuario") val idUsuario: String? = null,
+    @SerializedName("Documento") val documento: String? = null,
+
+    @SerializedName("Nombre") val nombre: String? = null,
+    @SerializedName("NombreCompleto") val nombreCompleto: String? = null,
+    @SerializedName("NombreUsuario") val nombreUsuario: String? = null
+)
 data class LocationDto(
     @SerializedName("AbreviacionCiudad") val abreviacionCiudad: String,
     @SerializedName("NombreCompleto") val nombreCompleto: String
